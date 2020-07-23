@@ -1,0 +1,14 @@
+{
+  "name": "@brikcss/generators",
+  "version": "0.0.0",
+  "description": "Series of generators for various projects and repetitive tasks.",
+  "homepage": "https://github.com/brikcss/generators",
+  "license": "ISC",
+  "author": "Tyson Zimmerman <thezimmee@gmail.com> (https://github.com/thezimmee)",
+  "repository": "https://github.com/brikcss/generators",
+  "scripts": {
+    "clean": "rm -rf scripts .auto-changelog .commitlintrc.js .huskyrc.js .lintstagedrc.js .prettierrc.js .release-it.js .stylelintrc.js CHANGELOG.tpl.md RELEASE.tpl.md"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

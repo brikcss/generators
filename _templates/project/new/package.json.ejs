@@ -1,0 +1,58 @@
+---
+to: ./package.json
+---
+<%-
+(() => {
+  /* globals locals, h */
+  const features = locals.features
+  const pkg = {
+    scripts: {},
+    devDependencies: {},
+    dependencies: {}
+  }
+  // Add dependency(ies) to pkg. If `type` is left out, defaults to `devDependencies`.
+  const add = (type, ...deps) => {
+    if (!['dev', ''].includes(type)) {
+      type = 'dev'
+      deps.unshift(type)
+    }
+    deps.forEach(dep => {
+      pkg[type ? `${type}Dependencies` : 'dependencies'][dep] = '0.0.x'
+    })
+  }
+
+  if (features.linting || features.release) {
+    add('@commitlint/cli', '@commitlint/config-conventional', 'husky', 'lint-staged')
+  }
+  if (features.release) {
+    add('release-it', 'name-your-contributors', 'ejs')
+    pkg.scripts['release'] = 'release-it'
+  }
+  if (features.githubPages) {
+    add('gh-pages')
+  }
+  if (features.linting) {
+    add('prettier', 'standard', 'stylelint', 'stylelint-config-recommended')
+  }
+  if (features.jest) {
+    add('jest')
+    pkg.scripts['test'] = 'jest'
+    pkg.scripts['coverage'] = 'npm test -- --coverage'
+  }
+  if (features.browserTesting) {
+    add('playwright')
+    pkg.scripts['test'] = 'jest'
+    pkg.scripts['coverage'] = 'npm test -- --coverage'
+  }
+  if (features.uiTesting) {
+    add('jest-image-snapshot')
+    pkg.scripts['test'] = 'jest'
+    pkg.scripts['coverage'] = 'npm test -- --coverage'
+  }
+  if (features.monorepo) {
+    add('lerna')
+  }
+
+  return JSON.stringify(h.pkg(locals, pkg), null, 2)
+})()
+%>

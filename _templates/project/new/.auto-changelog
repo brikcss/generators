@@ -1,0 +1,10 @@
+---
+to: '.auto-changelog'
+---
+{
+  "commlitLimit": false,
+  "handlebarsSetup": "scripts/autochangelog.js",
+  "output": "CHANGELOG.md",
+  "template": "CHANGELOG.tpl.md",
+  "unreleased": true
+}

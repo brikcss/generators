@@ -1,0 +1,9 @@
+---
+to: "<%= (locals.features.monorepo) ? 'lerna.json' : null %>"
+---
+{
+  "packages": [
+    "packages/*"
+  ],
+  "version": "independent"
+}
