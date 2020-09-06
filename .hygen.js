@@ -24,7 +24,8 @@ const PKG_KEYS = [
   'optionalDependencies',
   'engines',
   'private',
-  'publishConfig'
+  'publishConfig',
+  'standard'
 ]
 const REQUIRED_KEYS = {
   name: 'string',
@@ -62,16 +63,30 @@ function mergePkg (pkg, newPkg) {
   return pkg
 }
 
+function sortPkg (pkg) {
+  Object.keys(pkg).forEach(pkgKey => {
+    if (pkgKey.toLowerCase().includes('dependencies') && pkg[pkgKey] && Object.keys(pkg[pkgKey]).length) {
+      const sorted = {}
+      Object.keys(pkg[pkgKey]).sort().forEach(depKey => {
+        sorted[depKey] = pkg[pkgKey][depKey]
+      })
+      pkg[pkgKey] = sorted
+    }
+  })
+  return pkg
+}
+
 module.exports = {
   helpers: {
     // Merge with existing package.json data.
     pkg (...pkgs) {
       let existingPkg = fs.existsSync('./package.json')
       existingPkg = existingPkg ? JSON.parse(fs.readFileSync('./package.json', 'utf8')) : {}
-      return pkgs.reduce((result, newPkg) => {
+      const newPkg = pkgs.reduce((result, newPkg) => {
         result = mergePkg(result, newPkg)
         return result
-      }, existingPkg);
+      }, existingPkg)
+      return sortPkg(newPkg)
     },
     mergePkg,
     include (filepath) {

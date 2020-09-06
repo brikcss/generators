@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.linting ? './.prettierrc.js' : null %>"
+to: "<%= locals.features.linting ? '.prettierrc.js' : null %>"
 ---
 module.exports = {
   trailingComma: 'es5',

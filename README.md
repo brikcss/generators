@@ -1,35 +1,42 @@
 # Generators
 
-Quickly generate boilerplate code for various projects and tasks.
-
-## Prerequesites
-
-These generators are built with hygen. You must [install hygen](https://www.hygen.io/docs/quick-start) to run a generator.
-
-## Install
-
-To copy these generators into your project:
-
-```bash
-# Clone as a new repo:
-git clone https://github.com/brikcss/generators
-# Optionally If initializing a new git repo:
-rm -rf generators/.git
-```
-
-or:
-
-```bash
-# To copy into a git initialized project:
-svn checkout https://github.com/brikcss/generators/trunk
-```
+Quickly generate boilerplate files or code for various projects and tasks.
 
 ## Usage
 
-See [hygen](https://www.hygen.io/) for full usage details.
+1. Make sure [hygen](https://www.hygen.io/docs/quick-start) is installed.
 
-### Available generators
+2. Copy the generators into your project. You will need to copy the `_templates` folder and the `.hygen.js` configuration file in this repo. There are many ways you can do this, here are a couple:
 
-#### `project`
+    - Clone into a new project:
 
--   `hygen project new`: Generate a new project with prompts to guide you through.
+        ```bash
+        git clone https://github.com/brikcss/generators <project name> && rm -rf <project name>/.git
+        ```
+
+    - Copy into an existing project:
+
+        ```bash
+        # OPTIONAL: Remove existing generators if you want to start fresh:
+        rm -rf _templates
+        # Copy generators:
+        git clone https://github.com/brikcss/generators .generators && cp -R .generators/{_templates,.hygen.js} . && rm -rf .generators
+        ```
+
+    - Manually [download this repo](https://github.com/brikcss/generators/archive/master.zip) and copy generators (`_templates`) and configuration (`.hygen.js`) into your project.
+
+3. (optional) Update your root `package.json` with your project details to inform generators. You may also want to remove `README.md`. _Note: You may skip this step, in which case you will be prompted for additional information._
+
+4. Run a generator:
+
+    ```bash
+    hygen <generator> <action>
+    ```
+
+## Available generators
+
+See [hygen](https://www.hygen.io/) for full details on using generators.
+
+### `project`
+
+-   `hygen project new`: Generate a new project. The generator will look first in `package.json`, and prompt you for any other needed information.

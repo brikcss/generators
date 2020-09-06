@@ -1,0 +1,18 @@
+---
+to: .gitignore
+---
+# Node
+node_modules
+
+# MacOS
+.DS_Store
+
+# Testing
+/.nyc_output
+/coverage
+
+# Build files
+/dist
+/.temp
+*.zip
+*.tgz

@@ -1,6 +1,7 @@
 ---
 to: "<%= (locals.features.release) ? '.release-it.js' : null %>"
 ---
+/* eslint-disable no-template-curly-in-string */
 module.exports = {
   disableMetrics: true,
   hooks: {

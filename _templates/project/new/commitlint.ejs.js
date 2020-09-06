@@ -1,5 +1,5 @@
 ---
-to: "<%= (locals.features.linting || locals.features.release) ? './.commitlintrc.js': null %>"
+to: "<%= (locals.features.linting || locals.features.release) ? '.commitlintrc.js': null %>"
 ---
 module.exports = {
   rules: {

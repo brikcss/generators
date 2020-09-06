@@ -1,18 +1,19 @@
 ---
 to: "<%= (locals.features.testing) ? `${locals.features.monorepo ? 'packages/sample/' : ''}src/sample.test.js` : null %>"
 ---
+/* eslint-env jest */
 <% if (locals.features.browserTesting || locals.features.uiTesting) { _%>
 const playwright = require('playwright')
 <%_ } %>
 
-define('Sample unit tests', () => {
+describe('Sample unit tests', () => {
   test('add 1 + 1 equals 2', () => {
     expect(1 + 1).toBe(2)
   })
 })
 
 <% if (locals.features.browserTesting) { _%>
-define('Sample browser tests', () => {
+describe('Sample browser tests', () => {
   test('whatsmyuseragent in all browsers', () => {
     expect.assertions(3)
     (async () => {
@@ -30,7 +31,7 @@ define('Sample browser tests', () => {
 <%_ } %>
 
 <% if (locals.features.uiTesting) { _%>
-define('Sample visual regression tests', () => {
+describe('Sample visual regression tests', () => {
   let browser;
 
   beforeAll(async () => {

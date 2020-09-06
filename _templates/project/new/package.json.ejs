@@ -1,10 +1,28 @@
 ---
-to: ./package.json
+to: package.json
 ---
 <%-
 (() => {
   /* globals locals, h */
   const features = locals.features
+  const depsMap = {
+    '@commitlint/cli': '^9',
+    '@commitlint/config-conventional': '^9',
+    'ejs': '^3',
+    'gh-pages': '^3',
+    'husky': '^4',
+    'jest': '^26',
+    'jest-image-snapshot': '^4',
+    'lerna': '^3',
+    'lint-staged': '^10',
+    'name-your-contributors': '^3',
+    'playwright': '^1',
+    'prettier': '^2',
+    'release-it': '^14',
+    'standard': '^14',
+    'stylelint': '^13',
+    'stylelint-config-recommended': '^3',
+  }
   const pkg = {
     scripts: {},
     devDependencies: {},
@@ -13,11 +31,11 @@ to: ./package.json
   // Add dependency(ies) to pkg. If `type` is left out, defaults to `devDependencies`.
   const add = (type, ...deps) => {
     if (!['dev', ''].includes(type)) {
-      type = 'dev'
       deps.unshift(type)
+      type = 'dev'
     }
     deps.forEach(dep => {
-      pkg[type ? `${type}Dependencies` : 'dependencies'][dep] = '0.0.x'
+      pkg[type ? `${type}Dependencies` : 'dependencies'][dep] = depsMap[dep] || '0.0.x'
     })
   }
 
@@ -38,6 +56,11 @@ to: ./package.json
     add('jest')
     pkg.scripts['test'] = 'jest'
     pkg.scripts['coverage'] = 'npm test -- --coverage'
+    pkg['standard'] = {
+      ignore: [
+        '/_templates/'
+      ]
+    }
   }
   if (features.browserTesting) {
     add('playwright')

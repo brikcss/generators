@@ -1,6 +1,7 @@
 ---
 to: "scripts/add-contributors.js"
 ---
+/* globals Plugin */
 const nyc = require('name-your-contributors')
 const ejs = require('ejs')
 const fs = require('fs')
@@ -68,7 +69,6 @@ module.exports = class AddContributors extends Plugin {
       Object.keys(data).forEach(key => {
         data[key].forEach((c, i) => {
           let contributor = map[c.login]
-          let exists = false
           // Find or create contributor in map.
           if (!contributor) {
             map[c.login] = {
@@ -104,7 +104,7 @@ module.exports = class AddContributors extends Plugin {
         if (fs.existsSync(this.options.to)) {
           outputFile = fs.readFileSync(this.options.to, 'utf8')
         }
-        if (output.includes('<!-- START: CONTRIBUTORS -->') && output.includes('<!-- END: CONTRIBUTORS -->')) {
+        if (outputFile.includes('<!-- START: CONTRIBUTORS -->') && outputFile.includes('<!-- END: CONTRIBUTORS -->')) {
           outputFile = outputFile.replace(/<!-- START: CONTRIBUTORS -->([\s\S]*)<!-- END: CONTRIBUTORS -->/, markup)
         } else {
           outputFile = [outputFile, markup].join('\n\n')

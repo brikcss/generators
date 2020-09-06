@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.linting ? './.lintstagedrc.js' : null %>"
+to: "<%= locals.features.linting ? '.lintstagedrc.js' : null %>"
 ---
 module.exports = {
   '*.js': ['prettier --parser babel --write', 'standard --fix'],
