@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.release ? 'CHANGELOG.tpl.md' : null %>"
+to: "<%= locals.features.release ? locals.dest + 'CHANGELOG.tpl.md' : null %>"
 ---
 # Change log
 

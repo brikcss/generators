@@ -1,56 +1,120 @@
 const path = require('path')
+const fs = require('fs')
+
+function formatDest (dir) {
+  if (typeof dir !== 'string' || dir === '.') return ''
+  if (dir.slice(-1) !== '/') return dir + '/'
+  return dir
+}
+
+function findPkg (destDir) {
+  const cwd = process.cwd()
+  const destArray = ['', ...destDir.slice(0, -1).split('/')]
+  const destLength = destArray.length
+  let result
+  destArray.some((e, i) => {
+    const testPath = path.join(cwd, destArray.slice(0, destLength - i).join('/'), 'package.json')
+    if (fs.existsSync(testPath)) {
+      result = testPath
+      return true
+    }
+  })
+  return result
+}
 
 module.exports = {
   prompt: ({ prompter, args }) => {
-    const fs = require('fs')
-    const cwd = process.cwd()
-    const pkgExists = fs.existsSync(path.join(cwd, 'package.json'))
-    let answers = {}
-    let pkg = pkgExists ? require(path.join(cwd, 'package.json')) : {}
-    const questions = [{
-      type: 'select',
-      name: 'type',
-      message: 'What type of project is this?',
-      choices: [
-        { name: 'node', message: 'NodeJS' },
-        { name: 'web', message: 'Web project' }
-      ]
-    }, {
-      type: 'confirm',
-      name: 'monorepo',
-      message: 'Would you like to create a monorepo?'
-    }]
+    //
+    // STEP 1: Get project type and helpful data to auto configure.
+    //
 
-    if (pkgExists) {
-      let footer = JSON.stringify(pkg, null, 4).split('\n').slice(1, -1)
-      if (footer.length > 6) {
-        footer = footer.slice(0, 6)
-        footer.push('    ...')
-      }
-      footer = footer.join('\n')
+    if (args.name && ['node', 'web'].includes(args.name)) {
+      args.type = args.name
+      args.name = undefined
+    }
+    const questions = []
+    let answers = args || {}
+    let pkg = {}
+
+    if (!answers.type) {
+      questions.push({
+        type: 'select',
+        name: 'type',
+        message: 'What type of project is this?',
+        choices: [
+          { name: 'node', message: 'NodeJS' },
+          { name: 'web', message: 'Web project' }
+        ]
+      })
+    }
+
+    if (!answers.dest) {
+      questions.push({
+        type: 'input',
+        name: 'dest',
+        message: 'Where is the project\'s root directory (`.` for cwd)?',
+        initial: '.'
+      })
+    }
+
+    if (!answers.monorepo) {
       questions.push({
         type: 'confirm',
-        name: 'usePkg',
-        message: 'Is package.json accurate (if not, you may update it now and come back to this prompt)?',
-        footer,
-        initial: true
+        name: 'monorepo',
+        message: 'Would you like to create a monorepo?'
       })
     }
 
     return prompter
       .prompt(questions)
       .then(a => {
-        answers = a
-        if (!answers.usePkg) pkg = {}
-        const hasScope = pkg.name && pkg.name[0] === '@'
-        const pkgScope = hasScope ? pkg.name.split('/')[0] : ''
-        const questions = []
+        //
+        // STEP 2: Get any useful package.json data to auto configure.
+        //
 
-        if (!pkg.name) {
+        answers = Object.assign(answers, a)
+        const questions = []
+        const pkgPath = findPkg(answers.dest)
+        pkg = pkgPath ? require(pkgPath) : {}
+
+        if (pkgPath && !answers.usePkg) {
+          let footer = JSON.stringify(pkg, null, 4).split('\n').slice(1, -1)
+          if (footer.length > 6) {
+            footer = footer.slice(0, 6)
+            footer.push('    ...')
+          }
+          footer = footer.join('\n')
+          questions.push({
+            type: 'select',
+            name: 'usePkg',
+            message: `Use ${path.relative('.', pkgPath)}?`,
+            footer: `\n    package.json contents:\n\n${footer}\n\n    NOTE: You may update package.json for accuracy before completing this prompt.`,
+            initial: 'confirm',
+            choices: [
+              { name: 'yes', message: 'Yes, package.json is 100% accurate.' },
+              { name: 'confirm', message: 'Yes, but confirm.' },
+              { name: 'no', message: 'No, ask me everything.' }
+            ]
+          })
+        }
+
+        return prompter.prompt(questions)
+      })
+      .then(a => {
+        //
+        // STEP 3: Get any other missing data.
+        //
+
+        answers = Object.assign(answers, answers.usePkg !== 'no' ? pkg : {}, a)
+        answers.dest = formatDest(answers.dest)
+        const confirmPkg = answers.usePkg === 'confirm'
+        const questions = []
+        if (!answers.name || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'name',
-            message: 'What is the name of the project/package?'
+            message: 'What is the name of the project/package?',
+            initial: answers.name || (answers.dest ? answers.dest.slice(0, -1).split('/').slice(-1)[0] : '')
           }, {
             type: 'input',
             name: 'npm_scope',
@@ -61,67 +125,70 @@ module.exports = {
             }
           })
         } else {
-          pkg.npm_scope = pkgScope
+          const hasScope = answers.name && answers.name[0] === '@'
+          answers.npm_scope = hasScope ? answers.name.split('/')[0] : ''
         }
 
-        if (!pkg.repository) {
+        if (!answers.repository || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'github_username',
             message: 'What is the GitHub username?',
-            initial: (r) => r.enquirer.answers.npm_scope ? r.enquirer.answers.npm_scope.replace('@', '') : ''
+            initial: (r) => answers.repository || r.enquirer.answers.npm_scope ? r.enquirer.answers.npm_scope.replace('@', '') : ''
           }, {
             type: 'input',
             name: 'repository',
             message: 'What is the repo URL?',
             initial: (r) => {
+              if (r.enquirer.answers.repository) return r.enquirer.answers.repository
               const a = r.enquirer.answers
               return `https://github.com/${[a.github_username, a.name].filter(Boolean).join('/').toLowerCase()}`
             }
           })
         }
 
-        if (!pkg.homepage) {
+        if (!answers.homepage || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'homepage',
             message: 'What is the homepage?',
-            initial: (r) => r.enquirer.answers.repository || ''
+            initial: (r) => answers.homepage || r.enquirer.answers.repository || ''
           })
         }
 
-        if (!pkg.description) {
+        if (!answers.description || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'description',
-            message: 'What is the project/package description?'
+            message: 'What is the project/package description?',
+            initial: answers.description || ''
           })
         }
 
-        if (!pkg.version) {
+        if (!answers.version || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'version',
             message: 'What is the project/package starting version?',
-            initial: '0.0.0'
+            initial: answers.version || '0.0.0'
           })
         }
 
-        if (!pkg.author) {
+        if (!answers.author || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'author',
             message: 'What is the author\'s name and contact info?',
-            initial: 'Tyson Zimmerman <thezimmee@gmail.com> (https://github.com/thezimmee)'
+            initial: answers.author || 'Tyson Zimmerman <thezimmee@gmail.com> (https://github.com/thezimmee)'
           })
         }
 
-        if (!pkg.license) {
+        if (!answers.license || confirmPkg) {
           questions.push({
             type: 'input',
             name: 'license',
             message: 'What is the license?',
-            initial: 'ISC'
+            initial: answers.license || 'ISC'
           })
         }
 
@@ -132,9 +199,13 @@ module.exports = {
             }
             return a
           })
-          .then(a => Object.assign({}, pkg, answers, a))
       })
-      .then(answers => {
+      .then(a => {
+        //
+        // Step 4: Confirm all the desired features.
+        //
+
+        answers = Object.assign(answers, a)
         const features = {
           linting: true,
           jest: true,
@@ -161,7 +232,7 @@ module.exports = {
             { name: 'monorepo', message: 'Monorepo' },
             { name: 'jest', message: 'Testing: unit/e2e' },
             { name: 'uiTesting', message: 'Testing: UI/visual regression' },
-            { name: 'browserTesting', message: 'Testing: Browser/DOM' },
+            { name: 'browserTesting', message: 'Testing: Browser/DOM' }
           ],
           result (names) {
             for (const feature in features) {
@@ -171,7 +242,7 @@ module.exports = {
             features.testing = Boolean(features.jest || features.browserTesting || features.uiTesting)
             return features
           }
-        }]).then(a => Object.assign({}, answers, a))
+        }]).then(a => Object.assign(answers, a))
       })
   }
 }

@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.githubPages ? 'scripts/deploy-github-pages.js' : null %>"
+to: "<%= locals.features.githubPages ? locals.dest + 'scripts/deploy-github-pages.js' : null %>"
 ---
 const ghPages = require('gh-pages')
 

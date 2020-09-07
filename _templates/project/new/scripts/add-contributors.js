@@ -1,5 +1,5 @@
 ---
-to: "scripts/add-contributors.js"
+to: "<%= locals.dest %>scripts/add-contributors.js"
 ---
 /* globals Plugin */
 const nyc = require('name-your-contributors')

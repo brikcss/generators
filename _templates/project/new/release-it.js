@@ -1,5 +1,5 @@
 ---
-to: "<%= (locals.features.release) ? '.release-it.js' : null %>"
+to: "<%= (locals.features.release) ? locals.dest + '.release-it.js' : null %>"
 ---
 /* eslint-disable no-template-curly-in-string */
 module.exports = {

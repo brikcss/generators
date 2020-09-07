@@ -1,5 +1,5 @@
 ---
-to: "<%= (locals.features.testing) ? `${locals.features.monorepo ? 'packages/sample/' : ''}src/sample.test.js` : null %>"
+to: "<%= (locals.features.testing) ? locals.dest + `${locals.features.monorepo ? 'packages/sample/' : ''}src/sample.test.js` : null %>"
 ---
 /* eslint-env jest */
 <% if (locals.features.browserTesting || locals.features.uiTesting) { _%>

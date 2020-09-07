@@ -1,5 +1,5 @@
 ---
-to: ".jest-setup.js"
+to: "<%= locals.dest %>.jest-setup.js"
 ---
 /* eslint-env jest */
 <% if (locals.features.uiTesting) { _%>

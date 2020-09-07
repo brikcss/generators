@@ -1,5 +1,5 @@
 ---
-to: RELEASE.tpl.md
+to: "<%= locals.features.release ? locals.dest + 'RELEASE.tpl.md' : null %>"
 ---
 {{#each releases}}
     {{#if @first}}

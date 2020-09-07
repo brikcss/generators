@@ -1,5 +1,5 @@
 ---
-to: package.json
+to: "<%= locals.dest %>package.json"
 ---
 <%-
 (() => {
@@ -38,7 +38,34 @@ to: package.json
       pkg[type ? `${type}Dependencies` : 'dependencies'][dep] = depsMap[dep] || '0.0.x'
     })
   }
+  let jestAdded = false
+  const addJest = () => {
+    if (jestAdded) return
+    add('jest')
+    if (locals.type === 'node') {
+      pkg.scripts['start'] = 'jest --watch'
+    }
+    pkg.scripts.test = 'jest --coverage'
+    pkg.scripts['watch:tests'] = 'jest --watch'
+    jestAdded = true
+  }
 
+  if (features.jest) {
+    addJest()
+    pkg['standard'] = {
+      ignore: [
+        '/_templates/'
+      ]
+    }
+  }
+  if (features.browserTesting) {
+    addJest()
+    add('playwright')
+  }
+  if (features.uiTesting) {
+    addJest()
+    add('jest-image-snapshot')
+  }
   if (features.linting || features.release) {
     add('@commitlint/cli', '@commitlint/config-conventional', 'husky', 'lint-staged')
   }
@@ -51,26 +78,6 @@ to: package.json
   }
   if (features.linting) {
     add('prettier', 'standard', 'stylelint', 'stylelint-config-recommended')
-  }
-  if (features.jest) {
-    add('jest')
-    pkg.scripts['test'] = 'jest'
-    pkg.scripts['coverage'] = 'npm test -- --coverage'
-    pkg['standard'] = {
-      ignore: [
-        '/_templates/'
-      ]
-    }
-  }
-  if (features.browserTesting) {
-    add('playwright')
-    pkg.scripts['test'] = 'jest'
-    pkg.scripts['coverage'] = 'npm test -- --coverage'
-  }
-  if (features.uiTesting) {
-    add('jest-image-snapshot')
-    pkg.scripts['test'] = 'jest'
-    pkg.scripts['coverage'] = 'npm test -- --coverage'
   }
   if (features.monorepo) {
     add('lerna')

@@ -1,4 +1,4 @@
 ---
-to: .prettierignore
+to: "<%= locals.dest %>.prettierignore"
 ---
 _templates

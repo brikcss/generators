@@ -1,5 +1,5 @@
 ---
-to: "<%= (locals.features.linting || locals.features.release) ? '.huskyrc.js' : null %>"
+to: "<%= (locals.features.linting || locals.features.release) ? locals.dest + '.huskyrc.js' : null %>"
 ---
 module.exports = {
   hooks: {

@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.vercel ? 'scripts/deploy-verceljs.js' : null %>"
+to: "<%= locals.features.vercel ? locals.dest + 'scripts/deploy-verceljs.js' : null %>"
 ---
 const { Plugin } = require('release-it')
 const fs = require('fs')

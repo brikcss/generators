@@ -8,7 +8,7 @@ Quickly generate boilerplate files or code for various projects and tasks.
 
 2. Copy the generators into your project. You will need to copy the `_templates` folder and the `.hygen.js` configuration file in this repo. There are many ways you can do this, here are a couple:
 
-    - Clone into a new project:
+    - Clone as a new git project:
 
         ```bash
         git clone https://github.com/brikcss/generators <project name> && rm -rf <project name>/.git
@@ -18,9 +18,9 @@ Quickly generate boilerplate files or code for various projects and tasks.
 
         ```bash
         # OPTIONAL: Remove existing generators if you want to start fresh:
-        rm -rf _templates
+        rm -rf _templates .hygen.js
         # Copy generators:
-        git clone https://github.com/brikcss/generators .generators && cp -R .generators/{_templates,.hygen.js} . && rm -rf .generators
+        git clone https://github.com/brikcss/generators .__generators && cp -R .__generators/{_templates,.hygen.js} . && rm -rf .__generators
         ```
 
     - Manually [download this repo](https://github.com/brikcss/generators/archive/master.zip) and copy generators (`_templates`) and configuration (`.hygen.js`) into your project.

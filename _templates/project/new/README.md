@@ -1,5 +1,5 @@
 ---
-to: README.md
+to: "<%= locals.dest %>README.md"
 ---
 # <%= locals.name || 'New Project' %>
 

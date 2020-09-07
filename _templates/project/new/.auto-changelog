@@ -1,5 +1,5 @@
 ---
-to: '.auto-changelog'
+to: '<%= locals.dest %>.auto-changelog'
 ---
 {
   "commlitLimit": false,

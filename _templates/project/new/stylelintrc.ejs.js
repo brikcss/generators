@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.features.linting ? '.stylelintrc.js' : null %>"
+to: "<%= locals.features.linting ? locals.dest + '.stylelintrc.js' : null %>"
 ---
 module.exports = {
   extends: 'stylelint-config-recommended',

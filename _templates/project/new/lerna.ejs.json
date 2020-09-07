@@ -1,5 +1,5 @@
 ---
-to: "<%= (locals.features.monorepo) ? 'lerna.json' : null %>"
+to: "<%= (locals.features.monorepo) ? locals.dest + 'lerna.json' : null %>"
 ---
 {
   "packages": [
